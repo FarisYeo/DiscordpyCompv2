@@ -1,0 +1,61 @@
+# !/usr/bin/env python3
+
+# import re
+import discord
+from discord import app_commands
+from discord.ui import Button, View, Modal
+from discord.ext import commands
+# import random as r
+from typing import Optional
+# import datetime as dt
+# import asyncio
+
+def _textSection (content: str) -> discord.ui.TextDisplay:
+    """
+        Function: wrapper for Comp V2 > returns a TextDisplay
+        Usage: As a children of a discord.ui.Container, use _textSection ("<content>"); acts as a text box/section
+    """
+    return discord.ui.TextDisplay (content)
+
+def _sep () -> discord.ui.Separator:
+    """
+        Function: wrapper for Comp V2 > returns a Separator
+        Usage: As a children of a discord.ui.Container, use _sep (); acts as a separator in html or md "---"
+    """
+    return discord.ui.Separator ()
+
+def _buildContainer (*children) -> discord.ui.Container:
+    """
+        Function: wrapper for Comp V2 > returns a Container
+        Usage: As a children of a discord.ui.View, use _buildContainer (*children); acts as a container for other components in V2 DPY.
+    """
+    return discord.ui.Container (*children)
+
+class wrappertest (commands.Cog):
+    def __init__ (self, app: commands.Bot) -> None:
+        self.app      = app
+    
+    @app_commands.command  (name = "pingtest", description = "ping test")
+    # @app_commands.checks.dynamic_cooldown ()
+    @app_commands.describe (ephem = "send the reply ephemerally. default: False")
+    async def pingtest     (self, interaction: discord.Interaction, ephem: Optional[bool] = False ):
+        gateway = round    (self.bot.latency * 1000)
+        # here shld have the bot logic. build view comes aft bot logic.
+        # one may choose to put the build view outside of the command function too (or in another file! then just import it), for clarity.
+        def buildView ():
+            """
+                Command: /pingtest
+                Func: Build the view for said command. 
+                Usage: - 
+                Returns: discord.ui.View (view obj)
+            """
+            children = []
+            children.append (_textSection (f"**ping test**"))
+            children.append (_sep ())
+            children.append (_textSection (f"gateway latency: `{gateway} ms`"))
+            return _buildContainer (*children)
+
+        await interaction.response.send_message ( view = buildView (), ephemeral = ephem )
+
+async def setup (app: commands.Bot) -> None:
+    await app.add_cog (wrappertest (app))
